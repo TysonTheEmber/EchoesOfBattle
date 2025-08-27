@@ -21,6 +21,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.tysontheember.echoesofbattle.EchoesOfBattle;
 import net.tysontheember.echoesofbattle.sound.ModSounds;
 import net.tysontheember.echoesofbattle.sound.SoundUtils;
 
@@ -28,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = EchoesOfBattle.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class IgnisEventHandler {
 
     private static final String IGNIS_ID_STRING = "cataclysm:ignis";
