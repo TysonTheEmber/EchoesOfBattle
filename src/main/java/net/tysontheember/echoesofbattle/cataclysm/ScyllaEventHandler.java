@@ -1,8 +1,6 @@
 package net.tysontheember.echoesofbattle.cataclysm;
 
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -13,9 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -26,6 +21,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tysontheember.echoesofbattle.EchoesOfBattle;
 import net.tysontheember.echoesofbattle.sound.ModSounds;
+import net.tysontheember.echoesofbattle.util.CommandUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -105,7 +101,7 @@ public class ScyllaEventHandler {
                     ServerLevel lvl = scheduledSummonLevels.remove(uuid);
                     BlockPos pos = scheduledSummonPositions.remove(uuid);
                     if (lvl != null && pos != null) {
-                        runCommandNear(lvl, pos,
+                        CommandUtils.runCommandNear(lvl, Vec3.atCenterOf(pos),
                                 "immersivemessages sendcustom @s {font:'immersivemessages:norse', color:aqua, size:5, bold:1, y:150, typewriter:1, shake:1} 6 How dare you trample upon my palace!",
                                 COMMAND_RADIUS);
 
@@ -116,7 +112,7 @@ public class ScyllaEventHandler {
                         StreamSupport.stream(level.getEntities().getAll().spliterator(), false)
                                 .filter(e -> e.getUUID().equals(uuid))
                                 .findFirst()
-                                .ifPresent(scylla -> runCommandNear(level, scylla,
+                                .ifPresent(scylla -> CommandUtils.runCommandNear(level, scylla.position(),
                                         "immersivemessages sendcustom @s {font:\"immersivemessages:norse\",bold:1,background:1,size:3,y:100,color:aqua,obfuscate:0} 5 Scylla: Storm Empress",
                                         COMMAND_RADIUS));
                     }
@@ -138,7 +134,7 @@ public class ScyllaEventHandler {
                     return;
                 }
 
-                runCommandNear(level, deathPos,
+                CommandUtils.runCommandNear(level, deathPos,
                         "immersivemessages sendcustom @s {font:'immersivemessages:norse', color:aqua, size:5, bold:1, y:150, typewriter:0, shake:0} 8 I will not let you...",
                         COMMAND_RADIUS);
 
@@ -204,23 +200,4 @@ public class ScyllaEventHandler {
         return "cataclysm".equals(blockId.getNamespace()) && blockId.getPath().contains("respawn");
     }
 
-    private static void runCommandNear(ServerLevel level, Entity centerEntity, String command, double radius) {
-        runCommandNear(level, centerEntity.position(), command, radius);
-    }
-
-    private static void runCommandNear(ServerLevel level, BlockPos pos, String command, double radius) {
-        runCommandNear(level, Vec3.atCenterOf(pos), command, radius);
-    }
-
-    private static void runCommandNear(ServerLevel level, Vec3 center, String command, double radius) {
-        AABB area = new AABB(center.subtract(radius, radius, radius), center.add(radius, radius, radius));
-        List<ServerPlayer> players = level.getEntitiesOfClass(ServerPlayer.class, area);
-        for (ServerPlayer player : players) {
-            CommandSourceStack source = player.createCommandSourceStack()
-                    .withPermission(4)
-                    .withSuppressedOutput()
-                    .withPosition(player.position());
-            level.getServer().getCommands().performPrefixedCommand(source, command);
-        }
-    }
 }

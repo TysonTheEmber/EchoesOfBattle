@@ -13,7 +13,11 @@ public class CommandUtils {
     public static void runCommandNear(ServerLevel level, Vec3 center, String command, double radius) {
         AABB area = new AABB(center.subtract(radius, radius, radius), center.add(radius, radius, radius));
         List<ServerPlayer> players = level.getEntitiesOfClass(ServerPlayer.class, area);
+        double radiusSq = radius * radius;
         for (ServerPlayer player : players) {
+            if (player.position().distanceToSqr(center) > radiusSq) {
+                continue;
+            }
             CommandSourceStack source = player.createCommandSourceStack()
                     .withPermission(4)
                     .withSuppressedOutput()

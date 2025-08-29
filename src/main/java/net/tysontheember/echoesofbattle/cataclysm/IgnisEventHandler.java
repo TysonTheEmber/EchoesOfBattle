@@ -1,6 +1,5 @@
 package net.tysontheember.echoesofbattle.cataclysm;
 
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -9,11 +8,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -24,6 +21,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.tysontheember.echoesofbattle.EchoesOfBattle;
 import net.tysontheember.echoesofbattle.sound.ModSounds;
 import net.tysontheember.echoesofbattle.sound.SoundUtils;
+import net.tysontheember.echoesofbattle.util.CommandUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -115,7 +113,7 @@ public class IgnisEventHandler {
                     ServerLevel lvl = scheduledSummonLevels.remove(uuid);
                     BlockPos altarPos = scheduledSummonPositions.remove(uuid);
                     if (lvl != null && altarPos != null) {
-                        runCommandNear(lvl, altarPos, "immersivemessages sendcustom @s {font:'immersivemessages:norse', color:gold, size:5, bold:1, y:150, typewriter:1, shake:1} 6 It seems I have a challenger", COMMAND_RADIUS);
+                        CommandUtils.runCommandNear(lvl, Vec3.atCenterOf(altarPos), "immersivemessages sendcustom @s {font:'immersivemessages:norse', color:gold, size:5, bold:1, y:150, typewriter:1, shake:1} 6 It seems I have a challenger", COMMAND_RADIUS);
                         SoundUtils.playLoudSound(lvl, Vec3.atCenterOf(altarPos), ModSounds.IGNIS_SUMMON.getId(), 3.0F, 1.0F);
                     }
                 } else {
@@ -123,7 +121,7 @@ public class IgnisEventHandler {
                         StreamSupport.stream(level.getEntities().getAll().spliterator(), false)
                                 .filter(e -> e.getUUID().equals(uuid))
                                 .findFirst()
-                                .ifPresent(ignis -> runCommandNear(level, ignis, "immersivemessages sendcustom @s {font:\"immersivemessages:norse\",bold:1,background:1,size:3,y:100,color:gold,obfuscate:1} 5 Ignis: Inferno Knight", COMMAND_RADIUS));
+                                .ifPresent(ignis -> CommandUtils.runCommandNear(level, ignis.position(), "immersivemessages sendcustom @s {font:\"immersivemessages:norse\",bold:1,background:1,size:3,y:100,color:gold,obfuscate:1} 5 Ignis: Inferno Knight", COMMAND_RADIUS));
                     }
                 }
                 toRemoveSpawn.add(uuid);
@@ -156,7 +154,7 @@ public class IgnisEventHandler {
                                     }
                                 } else {
                                     String parsedCommand = command.replace("~ ~ ~", String.format("%.2f %.2f %.2f", ignis.getX(), ignis.getY(), ignis.getZ()));
-                                    runCommandNear(level, ignis, parsedCommand, COMMAND_RADIUS);
+                                    CommandUtils.runCommandNear(level, ignis.position(), parsedCommand, COMMAND_RADIUS);
                                 }
                             }
                             ran = true;
@@ -179,7 +177,7 @@ public class IgnisEventHandler {
                 Vec3 deathPos = deathPositions.remove(uuid);
                 if (deathPos == null) deathPos = Vec3.ZERO;
                 for (ServerLevel level : server.getAllLevels()) {
-                    runCommandNear(level, deathPos, "immersivemessages sendcustom @s {font:'immersivemessages:norse', color:aqua, size:5, bold:1, y:150, typewriter:0, shake:0} 8 You are strong indeed...", COMMAND_RADIUS);
+                    CommandUtils.runCommandNear(level, deathPos, "immersivemessages sendcustom @s {font:'immersivemessages:norse', color:aqua, size:5, bold:1, y:150, typewriter:0, shake:0} 8 You are strong indeed...", COMMAND_RADIUS);
                     SoundUtils.playLoudSound(level, deathPos, ModSounds.IGNIS_DEATH.getId(), 3.0F, 1.0F);
                 }
                 toRemoveDeath.add(uuid);
@@ -246,23 +244,4 @@ public class IgnisEventHandler {
         }
     }
 
-    private static void runCommandNear(ServerLevel level, Entity centerEntity, String command, double radius) {
-        runCommandNear(level, centerEntity.position(), command, radius);
-    }
-
-    private static void runCommandNear(ServerLevel level, BlockPos pos, String command, double radius) {
-        runCommandNear(level, Vec3.atCenterOf(pos), command, radius);
-    }
-
-    private static void runCommandNear(ServerLevel level, Vec3 center, String command, double radius) {
-        AABB area = new AABB(center.subtract(radius, radius, radius), center.add(radius, radius, radius));
-        List<ServerPlayer> players = level.getEntitiesOfClass(ServerPlayer.class, area);
-        for (ServerPlayer player : players) {
-            CommandSourceStack source = player.createCommandSourceStack()
-                    .withPermission(4)
-                    .withSuppressedOutput()
-                    .withPosition(player.position());
-            level.getServer().getCommands().performPrefixedCommand(source, command);
-        }
-    }
 }
