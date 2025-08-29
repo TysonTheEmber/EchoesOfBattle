@@ -18,6 +18,11 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> IGNIS_PHASE2 = register("ignis_phase2");
     public static final RegistryObject<SoundEvent> IGNIS_DEATH = register("ignis_death");
 
+    public static final RegistryObject<SoundEvent> SCYLLA_SUMMON = register("scylla_summon");
+    public static final RegistryObject<SoundEvent> SCYLLA_PHASE1 = register("scylla_phase1");
+    public static final RegistryObject<SoundEvent> SCYLLA_PHASE2 = register("scylla_phase2");
+    public static final RegistryObject<SoundEvent> SCYLLA_DEATH = register("scylla_death");
+
     private static RegistryObject<SoundEvent> register(String name) {
         return SOUND_EVENTS.register(name,
                 () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(EchoesOfBattle.MODID, name)));

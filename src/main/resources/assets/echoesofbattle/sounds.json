@@ -2,5 +2,9 @@
   "ignis_summon": { "sounds": ["echoesofbattle:ignis_summon"] },
   "ignis_phase1": { "sounds": ["echoesofbattle:ignis_phase1"] },
   "ignis_phase2": { "sounds": ["echoesofbattle:ignis_phase2"] },
-  "ignis_death": { "sounds": ["echoesofbattle:ignis_death"] }
+  "ignis_death": { "sounds": ["echoesofbattle:ignis_death"] },
+  "scylla_summon": { "sounds": ["echoesofbattle:scylla_summon"] },
+  "scylla_phase1": { "sounds": ["echoesofbattle:scylla_phase1"] },
+  "scylla_phase2": { "sounds": ["echoesofbattle:scylla_phase2"] },
+  "scylla_death": { "sounds": ["echoesofbattle:scylla_death"] }
 }
